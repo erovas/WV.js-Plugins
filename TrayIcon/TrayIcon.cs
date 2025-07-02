@@ -11,8 +11,6 @@ namespace NotifyIcon
 {
     public sealed class TrayIcon : Plugin
     {
-        private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam);
-
         private static string GetXbutton(IntPtr ptr)
         {
             int val32 = (ptr.ToInt32() >> 16) & 0xffff;
