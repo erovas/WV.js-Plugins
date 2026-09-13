@@ -8,7 +8,7 @@ namespace FileSystem
     [Singleton]
     public class FileSystem : Plugin
     {
-        public FileSystem(IWebView webView) : base(webView)
+        public FileSystem(IContext ctx) : base(ctx)
         {
         }
 
@@ -16,111 +16,111 @@ namespace FileSystem
 
         public void Create(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             var data = File.Create(path);
             data.Close();
         }
 
         public void Copy(string source, string destination, bool overwrite = false)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             File.Copy(source, destination, overwrite);
         }
 
         public bool Exists(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return File.Exists(path);
         }
 
         public void Delete(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             File.Delete(path);
         }
 
         public void SetCreationTime(string path, DateTime creationTime)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             File.SetCreationTime(path, creationTime);
         }
 
         public DateTime GetCreationTime(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return File.GetCreationTime(path);
         }
 
         public void SetLastAccessTime(string path, DateTime lastAccessTime)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             File.SetLastAccessTime(path, lastAccessTime);
         }
 
         public DateTime GetLastAccessTime(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return File.GetLastAccessTime(path);
         }
 
         public void SetLastWriteTime(string path, DateTime lastWriteTime)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             File.SetLastAccessTime(path, lastWriteTime);
         }
 
         public DateTime GetLastWriteTime(SafeFileHandle fileHandle)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return File.GetLastWriteTime(fileHandle);
         }
 
         public void SetAttributes(string path, string[] fileAttributes)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             FileAttributes attributes = ArrayToAttributes(fileAttributes);
             File.SetAttributes(path, attributes);
         }
 
         public string[] GetAttributes(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return AttributesToArray(File.GetAttributes(path));
         }
 
         public void Move(string source, string destination, bool overwrite = false)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             File.Move(source, destination, overwrite);
         }
 
         public string ReadAllText(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return File.ReadAllText(path);
         }
 
         public string[] ReadAllLines(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return File.ReadAllLines(path);
         }
 
         public void WriteAllText(string path, string text)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             File.WriteAllText(path, text);
         }
 
         public void AppendAllText(string path, string text)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             File.AppendAllText(path, text);
         }
 
         public void Replace(string sourceFileName, string destinationFileName, string? destinationBackupFileName)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             File.Replace(sourceFileName, destinationFileName, destinationBackupFileName);
         }
 

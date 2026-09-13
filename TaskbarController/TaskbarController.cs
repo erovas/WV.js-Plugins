@@ -18,7 +18,7 @@ namespace TaskbarManager
         private IntPtr Handle { get; }
         private ITaskbarList4 TaskbarList { get; }
 
-        public TaskbarController(IWebView webView) : base(webView)
+        public TaskbarController(IContext ctx) : base(ctx)
         {
             if(!(Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.CompareTo(new Version(6, 1)) >= 0))
                 throw new Exception("Platform not supported");
@@ -45,12 +45,12 @@ namespace TaskbarManager
         {
             get 
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return _Status;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (this.Status == TaskbarStatus.Indeterminate && value == TaskbarStatus.Normal)
                     this.TaskbarList.SetProgressState(this.Handle, eeTaskBarStatus.None);
@@ -66,12 +66,12 @@ namespace TaskbarManager
         {
             get 
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.Status.ToString();
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (Enum.TryParse(value, out TaskbarStatus myStatus))
                     this.Status = myStatus;
@@ -90,12 +90,12 @@ namespace TaskbarManager
         {
             get 
             { 
-                Plugin.ThrowDispose(this); 
+                ThrowIfDisposed(); 
                 return _Progress; 
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (value < MinValue)
                     value = MinValue;
@@ -121,12 +121,12 @@ namespace TaskbarManager
         public bool Visible { 
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this._Visible;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (this.Visible == value)
                     return;
@@ -166,12 +166,12 @@ namespace TaskbarManager
         {
             get 
             { 
-                Plugin.ThrowDispose(this); 
+                ThrowIfDisposed(); 
                 return _Icon; 
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (_Icon == value)
                     return;
@@ -193,12 +193,12 @@ namespace TaskbarManager
         {
             get 
             { 
-                Plugin.ThrowDispose(this); 
+                ThrowIfDisposed(); 
                 return _IconSmall; 
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (_IconSmall == value)
                     return;
@@ -303,7 +303,7 @@ namespace TaskbarManager
             get => _Blinking;
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (this.Blinking == value) 
                     return;

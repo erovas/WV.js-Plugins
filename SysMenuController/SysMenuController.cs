@@ -25,7 +25,7 @@ namespace SystemMenu
 
         #endregion
 
-        public SysMenuController(IWebView webView) : base(webView)
+        public SysMenuController(IContext ctx) : base(ctx)
         {
             this.IDGenerator = new IDGenerator();
             this._hCustomMenu = User32.CreatePopupMenu();
@@ -259,7 +259,7 @@ namespace SystemMenu
 
         public void AddItem(string title, object callback, bool enable = true)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentNullException("'" + nameof(title) + "' cannot be null or empty string");
@@ -297,7 +297,7 @@ namespace SystemMenu
 
         public void RemoveItem(string title)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentNullException("'" + nameof(title) + "' cannot be null or empty string");
@@ -325,7 +325,7 @@ namespace SystemMenu
 
         public void EnableItem(string title, bool enable)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (!this._IdTitles.ContainsValue(title))
                 throw new Exception($"'{title}' no exists");
@@ -338,7 +338,7 @@ namespace SystemMenu
 
         public void ShowMenu(int x = 0, int y = 0, bool relative = true)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (relative && User32.GetWindowRect(this.Handle, out RECT rect))
             {
@@ -353,7 +353,7 @@ namespace SystemMenu
 
         private void UpdateSystemItem(SysCommand sc, bool value)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             int v = (int)sc;
 
             if (this._systemItems[v].Visible == value)
@@ -366,7 +366,7 @@ namespace SystemMenu
 
         private bool GetSystemItemState(SysCommand sc)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return this._systemItems[(int)sc].Visible;
         }
 

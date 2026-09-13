@@ -38,15 +38,15 @@ namespace NotifyIcon
 
         private int DoubleClickSpeed { get; } = 500;
 
-        public TrayIcon(IWebView webView) : this(webView, "")
+        public TrayIcon(IContext ctx) : this(ctx, "")
         {
         }
 
-        public TrayIcon(IWebView webView, string icon) : this(webView, icon, "")
+        public TrayIcon(IContext ctx, string icon) : this(ctx, icon, "")
         {
         }
 
-        public TrayIcon(IWebView webView, string icon, string tooltip) : base(webView)
+        public TrayIcon(IContext ctx, string icon, string tooltip) : base(ctx)
         {
             // Configurar el icono
             this.WinHandle = User32.FindWindow(this.WebView.UID, null);
@@ -84,12 +84,12 @@ namespace NotifyIcon
         {
             get 
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return _ToolTip;
             } 
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 // Limitar a 127 caracteres (tamaño del buffer en NOTIFYICONDATA)
                 value = value.Length > 127 ? value.Substring(0, 127) : value;
@@ -123,12 +123,12 @@ namespace NotifyIcon
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return _Icon;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 IntPtr newHandle;
                 string fullPath = value;
@@ -190,12 +190,12 @@ namespace NotifyIcon
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return _Visible;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (_Visible == value)
                     return;
@@ -239,13 +239,13 @@ namespace NotifyIcon
 
         public void Show()
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             this.Visible = true;
         }
 
         public void Hide()
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             this.Visible = false;
         }
 
@@ -384,12 +384,12 @@ namespace NotifyIcon
         {
             get 
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.OnMouseDownFN?.Raw;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 if (this.OnMouseDownFN != null && value == this.OnMouseDownFN.Raw)
                     return;
 
@@ -419,12 +419,12 @@ namespace NotifyIcon
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.OnMouseUpFN?.Raw;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (this.OnMouseUpFN != null && value == this.OnMouseUpFN.Raw)
                     return;
@@ -455,12 +455,12 @@ namespace NotifyIcon
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.OnClickFN?.Raw;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (this.OnClickFN != null && value == this.OnClickFN.Raw)
                     return;
@@ -494,12 +494,12 @@ namespace NotifyIcon
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.OnDoubleClickFN?.Raw;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (this.OnDoubleClickFN != null && value == this.OnDoubleClickFN.Raw)
                     return;

@@ -7,7 +7,7 @@ namespace PathSystem
     [Singleton]
     public class PathSystem : Plugin
     {
-        public PathSystem(IWebView webView) : base(webView)
+        public PathSystem(IContext ctx) : base(ctx)
         {
         }
 
@@ -17,7 +17,7 @@ namespace PathSystem
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return Path.GetRandomFileName();
             }
         }
@@ -28,49 +28,49 @@ namespace PathSystem
 
         public string? ChangeExtension(string? path, string? extension)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.ChangeExtension(path, extension);
         }
 
         public bool Exists(string? path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.Exists(path);
         }
 
         public string? GetDirectoryName(string? path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.GetDirectoryName(path);
         }
 
         public string? GetExtension(string? path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.GetExtension(path);
         }
 
         public string? GetFileName(string? path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.GetFileName(path);
         }
 
         public string? GetFileNameWithoutExtension(string? path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.GetFileNameWithoutExtension(path);
         }
 
         public bool IsPathFullyQualified(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.IsPathRooted(path);
         }
 
         public bool HasExtension(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.HasExtension(path);
         }
 
@@ -81,25 +81,25 @@ namespace PathSystem
 
         public string Join(params string?[] paths)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.Join(paths);
         }
 
         public string GetRelativePath(string relativeTo, string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.GetRelativePath(relativeTo, path);
         }
 
         public string TrimEndingDirectorySeparator(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.TrimEndingDirectorySeparator(path);
         }
 
         public bool EndsInDirectorySeparator(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Path.EndsInDirectorySeparator(path);
         }
 

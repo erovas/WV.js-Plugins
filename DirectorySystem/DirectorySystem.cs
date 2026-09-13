@@ -7,7 +7,7 @@ namespace DirectorySystem
     [Singleton]
     public class DirectorySystem : Plugin
     {
-        public DirectorySystem(IWebView webView) : base(webView)
+        public DirectorySystem(IContext ct) : base(ct)
         {
         }
 
@@ -17,12 +17,12 @@ namespace DirectorySystem
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return Directory.GetCurrentDirectory();
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 Directory.SetCurrentDirectory(value);
             }
         }
@@ -31,7 +31,7 @@ namespace DirectorySystem
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return Directory.GetLogicalDrives();
             }
         }
@@ -42,73 +42,73 @@ namespace DirectorySystem
 
         public void Create(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             Directory.CreateDirectory(path);
         }
 
         public bool Exists(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Directory.Exists(path);
         }
 
         public void Delete(string path, bool recursive = false)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             Directory.Delete(path, recursive);
         }
 
         public void Move(string sourceDirName, string destDirName)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             Directory.Move(sourceDirName, destDirName);
         }
 
         public string GetDirectoryRoot(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Directory.GetDirectoryRoot(path);
         }
 
         public void SetCreationTime(string path, DateTime creationTime)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             Directory.SetCreationTime(path, creationTime);
         }
 
         public DateTime GetCreationTime(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Directory.GetCreationTime(path);
         }
 
         public void SetLastWriteTime(string path, DateTime lastWriteTime)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             Directory.SetLastWriteTime(path, lastWriteTime);
         }
 
         public DateTime GetLastWriteTime(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Directory.GetLastWriteTime(path);
         }
 
         public void SetLastAccessTime(string path, DateTime lastAccessTime)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             Directory.SetLastAccessTime(path, lastAccessTime);
         }
 
         public DateTime GetLastAccessTime(string path)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return Directory.GetLastAccessTime(path);
         }
 
         public string[] GetFiles(string path, string searchPattern = "*", string searchOption = "TopDirectoryOnly")
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (Enum.TryParse(searchOption, out SearchOption sOptions))
                 return Directory.GetFiles(path, searchPattern, sOptions);
@@ -118,7 +118,7 @@ namespace DirectorySystem
 
         public string[] GetDirectories(string path, string searchPattern = "*", string searchOption = "TopDirectoryOnly")
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (Enum.TryParse(searchOption, out SearchOption sOptions))
                 return Directory.GetDirectories(path, searchPattern, sOptions);
@@ -128,7 +128,7 @@ namespace DirectorySystem
 
         public string[] GetFileSystemEntries(string path, string searchPattern = "*", string searchOption = "TopDirectoryOnly")
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (Enum.TryParse(searchOption, out SearchOption sOptions))
                 return Directory.GetFileSystemEntries(path, searchPattern, sOptions);

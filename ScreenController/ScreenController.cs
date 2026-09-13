@@ -54,7 +54,7 @@ namespace ScreenController
         }
 
 
-        public ScreenController(IWebView webView) : base(webView)
+        public ScreenController(IContext ctx) : base(ctx)
         {
             HScreenController.Handled = User32.FindWindow(this.WebView.UID, null);
         }
@@ -65,7 +65,7 @@ namespace ScreenController
         {
             get 
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 List<ScreenInfo> screenInfos = new List<ScreenInfo>();
 
                 foreach (var item in HScreenController.GetAllScreensInfo())
@@ -79,7 +79,7 @@ namespace ScreenController
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return RECT2Rect(HScreenController.GetVirtualScreenBounds());
             }
         }
@@ -88,7 +88,7 @@ namespace ScreenController
 
         public ScreenInfo? ScreenFromPoint(int x, int y)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             foreach (var screen in HScreenController.GetAllScreensInfo())
                 if (x >= screen.MonitorArea.Left && x < screen.MonitorArea.Right && y >= screen.MonitorArea.Top && y < screen.MonitorArea.Bottom)
@@ -99,7 +99,7 @@ namespace ScreenController
 
         public string CaptureRegionBase64BMP(int x, int y, int width, int height, bool excludeAppWindow = false, bool includeCursor = false)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             RECT rect = new RECT()
             {
@@ -114,7 +114,7 @@ namespace ScreenController
 
         public byte[] CaptureRegionBytesBMP(int x, int y, int width, int height, bool excludeAppWindow = false, bool includeCursor = false)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             RECT rect = new RECT()
             {
@@ -134,7 +134,7 @@ namespace ScreenController
 
         public byte[] CaptureFullDesktopBytesBMP(bool excludeAppWindow = false, bool includeCursor = false)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return HScreenController.CaptureFullDesktopAsBmp(excludeAppWindow, includeCursor);
         }
 

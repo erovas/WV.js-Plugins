@@ -67,7 +67,7 @@ namespace MouseController
         private bool IsRawRegistered { get; set; } = false;
         
 
-        public MouseController(IWebView webView) : base(webView)
+        public MouseController(IContext ctx) : base(ctx)
         {
             this.Handle = User32.FindWindow(this.WebView.UID, null);
             this.DoubleClickSpeed = User32.GetDoubleClickTime();
@@ -217,7 +217,7 @@ namespace MouseController
         { 
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 int intSpeed = 0;
                 IntPtr ptr;
                 ptr = Marshal.AllocCoTaskMem(4);
@@ -228,7 +228,7 @@ namespace MouseController
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if(value < 0)
                     value = 0;
@@ -247,13 +247,13 @@ namespace MouseController
         {
             get 
             { 
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 User32.GetCursorPos(out POINT point);
                 return point.X;
             }
             set 
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 User32.GetCursorPos(out POINT point);
                 User32.SetCursorPos(value, point.Y);
             }
@@ -263,13 +263,13 @@ namespace MouseController
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 User32.GetCursorPos(out POINT point);
                 return point.Y;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 User32.GetCursorPos(out POINT point);
                 User32.SetCursorPos(point.X, value);
             }
@@ -283,7 +283,7 @@ namespace MouseController
 
         public void ClipCursor(int x, int y, int width, int height)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if(this.IsCursorClipped)
                 return;
@@ -302,7 +302,7 @@ namespace MouseController
 
         public void UnclipCursor()
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (!this.IsCursorClipped)
                 return;
@@ -316,7 +316,7 @@ namespace MouseController
         /// </summary>
         public void SetPosition(int x, int y)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             User32.SetCursorPos(x, y);
         }
 
@@ -325,7 +325,7 @@ namespace MouseController
         /// </summary>
         public int[] GetPosition()
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             User32.GetCursorPos(out POINT point);
             return [point.X, point.Y];
         }
@@ -336,7 +336,7 @@ namespace MouseController
         /// <param name="button"></param>
         public void DoClick(string button)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             (MouseEventFlags, uint) btn = GetClickEnum(GetButtonName(button));
             User32.mouse_event((uint)btn.Item1, 0, 0, btn.Item2, 0);
         }
@@ -347,7 +347,7 @@ namespace MouseController
         /// <param name="button"></param>
         public void DoDoubleClick(string button)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             (MouseEventFlags, uint) btn = GetClickEnum(GetButtonName(button));
             User32.mouse_event((uint)btn.Item1, 0, 0, btn.Item2, 0);
             User32.mouse_event((uint)btn.Item1, 0, 0, btn.Item2, 0);
@@ -359,7 +359,7 @@ namespace MouseController
         /// <param name="button"></param>
         public void ButtonDown(string button)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             MouseEventFlags btn = MouseEventFlags.X_DOWN;
             uint dwdata = 0;
 
@@ -395,7 +395,7 @@ namespace MouseController
         /// <param name="button"></param>
         public void ButtonUp(string button)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             MouseEventFlags btn = MouseEventFlags.X_UP;
             uint dwdata = 0;
 
@@ -431,7 +431,7 @@ namespace MouseController
         /// <param name="delta">Valor positivo para arriba, negativo para abajo</param>
         public void VerticalScroll(int delta)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             User32.mouse_event((uint)MouseEventFlags.WHEEL, 0, 0, (uint)delta, 0);
         }
 
@@ -441,7 +441,7 @@ namespace MouseController
         /// <param name="delta">Valor positivo para derecha, negativo para izquierda</param>
         public void HorizontalScroll(int delta)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             User32.mouse_event((uint)MouseEventFlags.HWHEEL, 0, 0, (uint)delta, 0);
         }
 
@@ -450,7 +450,7 @@ namespace MouseController
         /// </summary>
         public void CustomDoubleClick(string button, int intervalMs)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             (MouseEventFlags, uint) btn = GetClickEnum(GetButtonName(button));
             User32.mouse_event((uint)btn.Item1, 0, 0, btn.Item2, 0);
             System.Threading.Thread.Sleep(intervalMs);
@@ -476,7 +476,7 @@ namespace MouseController
         /// </summary>
         public void AcceleratedHorizontalScroll(int totalSteps, int initialDelta = 50)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             int delta = initialDelta;
             for (int i = 0; i < totalSteps; i++)
             {
@@ -491,7 +491,7 @@ namespace MouseController
         /// </summary>
         public void SmoothMove(int pX, int pY, int durationMs)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             User32.GetCursorPos(out POINT start);
             var timer = new System.Diagnostics.Stopwatch();
             timer.Start();
@@ -521,12 +521,12 @@ namespace MouseController
         {
             get 
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.OnMouseMoveFN != null ? this.OnMouseMoveFN.Raw : null;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if(this.OnMouseMoveFN != null && value == this.OnMouseMoveFN.Raw)
                     return;
@@ -557,12 +557,12 @@ namespace MouseController
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.OnMouseWheelFN?.Raw;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (this.OnMouseWheelFN != null && value == this.OnMouseWheelFN.Raw)
                     return;
@@ -593,12 +593,12 @@ namespace MouseController
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.OnMouseDownFN?.Raw;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (this.OnMouseDownFN != null && value == this.OnMouseDownFN.Raw)
                     return;
@@ -629,12 +629,12 @@ namespace MouseController
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.OnMouseUpFN?.Raw;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (this.OnMouseUpFN != null && value == this.OnMouseUpFN.Raw)
                     return;
@@ -665,12 +665,12 @@ namespace MouseController
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.OnClickFN?.Raw;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (this.OnClickFN != null && value == this.OnClickFN.Raw)
                     return;
@@ -701,12 +701,12 @@ namespace MouseController
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.OnDoubleClickFN?.Raw;
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
 
                 if (this.OnDoubleClickFN != null && value == this.OnDoubleClickFN.Raw)
                     return;

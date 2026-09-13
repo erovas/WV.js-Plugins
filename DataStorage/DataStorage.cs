@@ -9,7 +9,7 @@ namespace DataStorage
     {
         private Dictionary<string, object?> Data { get; set; }
 
-        public DataStorage(IWebView webView) : base(webView)
+        public DataStorage(IContext ctx) : base(ctx)
         {
             this.Data = AppManager.DataStorage;
         }
@@ -19,7 +19,7 @@ namespace DataStorage
         public int Count {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.Data.Count;
             }
         }
@@ -28,7 +28,7 @@ namespace DataStorage
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.Data.Keys.ToArray();
             }
         }
@@ -36,7 +36,7 @@ namespace DataStorage
         public object?[] Values
         {
             get { 
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.Data.Values.ToArray();
             }
         }
@@ -50,12 +50,12 @@ namespace DataStorage
         {
             get
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 return this.Data[key];
             }
             set
             {
-                Plugin.ThrowDispose(this);
+                ThrowIfDisposed();
                 this.Data[key] = value;
             }
         }
@@ -66,19 +66,19 @@ namespace DataStorage
 
         public void Clear()
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             this.Data.Clear();
         }
 
         public bool Exists(string name)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
             return string.IsNullOrEmpty(name) ? false : this.Data.ContainsKey(name);
         }
 
         public object? Get(string name)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (Exists(name))
                 return this.Data[name];
@@ -88,7 +88,7 @@ namespace DataStorage
 
         public bool Set(string name, object? value)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (!Exists(name))
                 return false;
@@ -99,7 +99,7 @@ namespace DataStorage
 
         public bool Add(string name, object? value)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (Exists(name))
                 return false;
@@ -110,7 +110,7 @@ namespace DataStorage
 
         public bool Remove(string name)
         {
-            Plugin.ThrowDispose(this);
+            ThrowIfDisposed();
 
             if (Exists(name))
                 return this.Data.Remove(name);
