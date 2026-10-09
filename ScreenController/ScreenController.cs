@@ -3,13 +3,11 @@ using ScreenController.Win32.Enums;
 using ScreenController.Helpers;
 using ScreenController.Public;
 using ScreenController.Win32;
-using WV.Attributes;
 using WV.Interfaces;
 using WV;
 
 namespace ScreenController
 {
-    [Singleton]
     public class ScreenController : Plugin
     {
         private static string[] GetStringStateFlags(StateFlags value)
@@ -54,7 +52,7 @@ namespace ScreenController
         }
 
 
-        public ScreenController(IContext ctx) : base(ctx)
+        public ScreenController(IPluginContext ctx) : base(ctx)
         {
             HScreenController.Handled = User32.FindWindow(this.WebView.UID, null);
         }

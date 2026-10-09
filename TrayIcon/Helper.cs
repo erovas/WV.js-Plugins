@@ -28,7 +28,7 @@ namespace NotifyIcon
             return newHandle;
         }
 
-        public static IntPtr GetNotificationIcon(string iconSource)
+        public static IntPtr GetNotificationIcon(string iconSource, string root)
         {
             if (string.IsNullOrEmpty(iconSource))
                 return IntPtr.Zero;
@@ -54,7 +54,7 @@ namespace NotifyIcon
                         return GetDefaultIconHandle();
 
                     if (!Path.IsPathFullyQualified(iconSource))
-                        fullPath = AppManager.SrcPath + "/" + iconSource;
+                        fullPath = Path.Combine(root, iconSource);
 
                     if (!File.Exists(fullPath))
                         throw new FileNotFoundException("File not found: '" + iconSource + "'");

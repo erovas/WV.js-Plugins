@@ -1,62 +1,28 @@
 ﻿using WV;
-using WV.Attributes;
 using WV.Interfaces;
-using static WV.AppManager;
 using MouseController.Win32;
+using static WV.App.Delegates;
 using MouseController.Win32.Enums;
 using MouseController.Win32.Structs;
 using System.Runtime.InteropServices;
 
 namespace MouseController
 {
-    [Singleton]
     public sealed class MouseController : Plugin
     {
         #region EVENTS
 
-        private readonly object _eventLock = new object();
-        private event WVEventHandler<int, int>? mouseMove;
-        private event WVEventHandler<int, int, int>? mouseWheel;
-        private event WVEventHandler<string, int, int>? mouseDown;
-        private event WVEventHandler<string, int, int>? mouseUp;
-        private event WVEventHandler<string, int, int>? click;
-        private event WVEventHandler<string, int, int>? doubleClick;
+        public event WVEventHandler<int, int>? MouseMove;
 
-        public event WVEventHandler<int, int> MouseMove
-        {
-            add { lock (_eventLock) { mouseMove += value; UpdateDeviceRegistration(); } }
-            remove { lock (_eventLock) { mouseMove -= value; UpdateDeviceRegistration(); } }
-        }
+        public event WVEventHandler<int, int, int>? MouseWheel;
 
-        public event WVEventHandler<int, int, int> MouseWheel
-        {
-            add { lock (_eventLock) { mouseWheel += value; UpdateDeviceRegistration(); } }
-            remove { lock (_eventLock) { mouseWheel -= value; UpdateDeviceRegistration(); } }
-        }
+        public event WVEventHandler<string, int, int>? MouseDown;
 
-        public event WVEventHandler<string, int, int> MouseDown
-        {
-            add { lock (_eventLock) { mouseDown += value; UpdateDeviceRegistration(); } }
-            remove { lock (_eventLock) { mouseDown -= value; UpdateDeviceRegistration(); } }
-        }
+        public event WVEventHandler<string, int, int>? MouseUp;
 
-        public event WVEventHandler<string, int, int> MouseUp
-        {
-            add { lock (_eventLock) { mouseUp += value; UpdateDeviceRegistration(); } }
-            remove { lock (_eventLock) { mouseUp -= value; UpdateDeviceRegistration(); } }
-        }
+        public event WVEventHandler<string, int, int>? Click;
 
-        public event WVEventHandler<string, int, int> Click
-        {
-            add { lock (_eventLock) { click += value; UpdateDeviceRegistration(); } }
-            remove { lock (_eventLock) { click -= value; UpdateDeviceRegistration(); } }
-        }
-
-        public event WVEventHandler<string, int, int> DoubleClick
-        {
-            add { lock (_eventLock) { doubleClick += value; UpdateDeviceRegistration(); } }
-            remove { lock (_eventLock) { doubleClick -= value; UpdateDeviceRegistration(); } }
-        }
+        public event WVEventHandler<string, int, int>? DoubleClick;
 
         #endregion
 
@@ -67,7 +33,7 @@ namespace MouseController
         private bool IsRawRegistered { get; set; } = false;
         
 
-        public MouseController(IContext ctx) : base(ctx)
+        public MouseController(IPluginContext ctx) : base(ctx)
         {
             this.Handle = User32.FindWindow(this.WebView.UID, null);
             this.DoubleClickSpeed = User32.GetDoubleClickTime();
@@ -109,6 +75,7 @@ namespace MouseController
                 }
             }
         }
+        
         private void ProcessMouseData(RAWMOUSE mouse)
         {
             // Obtener coordenadas del cursor
@@ -189,12 +156,9 @@ namespace MouseController
 
         private void UpdateDeviceRegistration()
         {
-            bool hasSubscribers = mouseMove != null || mouseDown != null ||
-                                  mouseUp != null || click != null ||
-                                  doubleClick != null || mouseWheel != null ||
-                                  OnMouseMove != null || OnMouseDown != null ||
-                                  OnMouseUp != null || OnClick != null ||
-                                  OnDoubleClick != null || OnMouseWheel != null;
+            bool hasSubscribers = MouseMove != null || MouseDown != null ||
+                                  MouseUp != null || Click != null ||
+                                  DoubleClick != null || MouseWheel != null;
 
             if (hasSubscribers && !this.IsRawRegistered)
             {
@@ -281,6 +245,13 @@ namespace MouseController
 
         #region METHODS
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         public void ClipCursor(int x, int y, int width, int height)
         {
             ThrowIfDisposed();
@@ -300,6 +271,9 @@ namespace MouseController
                 this.IsCursorClipped = true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void UnclipCursor()
         {
             ThrowIfDisposed();
@@ -508,226 +482,65 @@ namespace MouseController
             User32.SetCursorPos(pX, pY);
         }
 
+        public override void AddEventListener(string type, object callback)
+        {
+            try
+            {
+                base.AddEventListener(type, callback);
+                UpdateDeviceRegistration();
+            }
+            catch (Exception ex)
+            {
+                throw (ex.InnerException ?? ex);
+            }
+        }
+
+        public override void RemoveEventListener(string type, object callback)
+        {
+            try
+            {
+                base.RemoveEventListener(type, callback);
+                UpdateDeviceRegistration();
+            }
+            catch (Exception ex)
+            {
+                throw (ex.InnerException ?? ex);
+            }
+        }
 
         #endregion
 
-        #region EVENTS
-
-        #region MouseMove
-
-        private IJSFunction? OnMouseMoveFN { get; set; }
-
-        public object? OnMouseMove
-        {
-            get 
-            {
-                ThrowIfDisposed();
-                return this.OnMouseMoveFN != null ? this.OnMouseMoveFN.Raw : null;
-            }
-            set
-            {
-                ThrowIfDisposed();
-
-                if(this.OnMouseMoveFN != null && value == this.OnMouseMoveFN.Raw)
-                    return;
-
-                this.OnMouseMoveFN?.Dispose();
-                this.OnMouseMoveFN = null;
-
-                if (value != null)
-                    this.OnMouseMoveFN = IJSFunction.Create(value);
-
-                this.UpdateDeviceRegistration();
-            }
-        }
+        #region Fire Events
 
         private void FireMouseMove(int x, int y)
         {
-            this.OnMouseMoveFN?.Execute(x, y);
-            this.mouseMove?.Invoke(this.WebView, x, y);
-        }
-
-        #endregion
-
-        #region MouseWheel
-
-        private IJSFunction? OnMouseWheelFN { get; set; }
-
-        public object? OnMouseWheel
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return this.OnMouseWheelFN?.Raw;
-            }
-            set
-            {
-                ThrowIfDisposed();
-
-                if (this.OnMouseWheelFN != null && value == this.OnMouseWheelFN.Raw)
-                    return;
-
-                this.OnMouseWheelFN?.Dispose();
-                this.OnMouseWheelFN = null;
-
-                if (value != null)
-                    this.OnMouseWheelFN = IJSFunction.Create(value);
-
-                this.UpdateDeviceRegistration();
-            }
+            this.MouseMove?.Invoke(this.WebView, x, y);
         }
 
         private void FireMouseWheel(int delta, int x, int y)
         {
-            this.OnMouseWheelFN?.Execute(x, y);
-            this.mouseWheel?.Invoke(this.WebView, delta, x, y);
-        }
-
-        #endregion
-
-        #region MouseDown
-
-        private IJSFunction? OnMouseDownFN { get; set; }
-
-        public object? OnMouseDown
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return this.OnMouseDownFN?.Raw;
-            }
-            set
-            {
-                ThrowIfDisposed();
-
-                if (this.OnMouseDownFN != null && value == this.OnMouseDownFN.Raw)
-                    return;
-
-                this.OnMouseDownFN?.Dispose();
-                this.OnMouseDownFN = null;
-
-                if (value != null)
-                    this.OnMouseDownFN = IJSFunction.Create(value);
-
-                this.UpdateDeviceRegistration();
-            }
+            this.MouseWheel?.Invoke(this.WebView, delta, x, y);
         }
 
         private void FireMouseDown(string button, int x, int y)
         {
-            this.OnMouseDownFN?.Execute(x, y);
-            this.mouseDown?.Invoke(this.WebView, button, x, y);
-        }
-
-        #endregion
-
-        #region MouseUp
-
-        private IJSFunction? OnMouseUpFN { get; set; }
-
-        public object? OnMouseUp
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return this.OnMouseUpFN?.Raw;
-            }
-            set
-            {
-                ThrowIfDisposed();
-
-                if (this.OnMouseUpFN != null && value == this.OnMouseUpFN.Raw)
-                    return;
-
-                this.OnMouseUpFN?.Dispose();
-                this.OnMouseUpFN = null;
-
-                if (value != null)
-                    this.OnMouseUpFN = IJSFunction.Create(value);
-
-                this.UpdateDeviceRegistration();
-            }
+            this.MouseDown?.Invoke(this.WebView, button, x, y);
         }
 
         private void FireMouseUp(string button, int x, int y)
         {
-            this.OnMouseUpFN?.Execute(x, y);
-            this.mouseUp?.Invoke(this.WebView, button, x, y);
-        }
-
-        #endregion
-
-        #region Click
-
-        private IJSFunction? OnClickFN { get; set; }
-
-        public object? OnClick
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return this.OnClickFN?.Raw;
-            }
-            set
-            {
-                ThrowIfDisposed();
-
-                if (this.OnClickFN != null && value == this.OnClickFN.Raw)
-                    return;
-
-                this.OnClickFN?.Dispose();
-                this.OnClickFN = null;
-
-                if (value != null)
-                    this.OnClickFN = IJSFunction.Create(value);
-
-                this.UpdateDeviceRegistration();
-            }
+            this.MouseUp?.Invoke(this.WebView, button, x, y);
         }
 
         private void FireClick(string button, int x, int y)
         {
-            this.OnClickFN?.Execute(button, x, y);
-            this.click?.Invoke(this.WebView, button, x, y);
-        }
-
-        #endregion
-
-        #region DoubleClick
-
-        private IJSFunction? OnDoubleClickFN { get; set; }
-
-        public object? OnDoubleClick
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return this.OnDoubleClickFN?.Raw;
-            }
-            set
-            {
-                ThrowIfDisposed();
-
-                if (this.OnDoubleClickFN != null && value == this.OnDoubleClickFN.Raw)
-                    return;
-
-                this.OnDoubleClickFN?.Dispose();
-                this.OnDoubleClickFN = null;
-
-                if (value != null)
-                    this.OnDoubleClickFN = IJSFunction.Create(value);
-
-                this.UpdateDeviceRegistration();
-            }
+            this.Click?.Invoke(this.WebView, button, x, y);
         }
 
         private void FireDoubleClick(string button, int x, int y)
         {
-            this.OnDoubleClickFN?.Execute(button, x, y);
-            this.doubleClick?.Invoke(this.WebView, button, x, y);
+            this.DoubleClick?.Invoke(this.WebView, button, x, y);
         }
-
-        #endregion
 
         #endregion
 
@@ -737,18 +550,7 @@ namespace MouseController
                 return;
 
             this.WebView.Window.Raw -= Window_Raw;
-            this.ClearOnEvents();
             this.UpdateDeviceRegistration();
-        }
-
-        private void ClearOnEvents()
-        {
-            this.OnMouseMove = null;
-            this.OnMouseWheel = null;
-            this.OnMouseDown = null;
-            this.OnMouseUp = null;
-            this.OnClickFN = null;
-            this.OnDoubleClickFN = null;
         }
 
         #region HELPERs

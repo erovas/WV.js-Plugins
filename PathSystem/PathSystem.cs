@@ -1,13 +1,11 @@
 ﻿using WV;
-using WV.Attributes;
 using WV.Interfaces;
 
 namespace PathSystem
 {
-    [Singleton]
     public class PathSystem : Plugin
     {
-        public PathSystem(IContext ctx) : base(ctx)
+        public PathSystem(IPluginContext ctx) : base(ctx)
         {
         }
 

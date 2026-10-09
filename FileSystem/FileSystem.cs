@@ -1,14 +1,12 @@
 ﻿using WV;
-using WV.Attributes;
 using WV.Interfaces;
 using Microsoft.Win32.SafeHandles;
 
 namespace FileSystem
 {
-    [Singleton]
     public class FileSystem : Plugin
     {
-        public FileSystem(IContext ctx) : base(ctx)
+        public FileSystem(IPluginContext ctx) : base(ctx)
         {
         }
 

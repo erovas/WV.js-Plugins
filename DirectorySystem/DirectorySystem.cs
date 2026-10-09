@@ -1,13 +1,11 @@
 ﻿using WV;
-using WV.Attributes;
 using WV.Interfaces;
 
 namespace DirectorySystem
 {
-    [Singleton]
     public class DirectorySystem : Plugin
     {
-        public DirectorySystem(IContext ct) : base(ct)
+        public DirectorySystem(IPluginContext ct) : base(ct)
         {
         }
 

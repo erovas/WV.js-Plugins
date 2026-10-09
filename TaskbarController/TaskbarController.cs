@@ -1,5 +1,4 @@
 ﻿using WV;
-using WV.Attributes;
 using WV.Interfaces;
 using TaskbarManager.Enums;
 using TaskbarManager.Win32;
@@ -12,13 +11,13 @@ using TaskbarManager.TaskbarList.Interfaces;
 
 namespace TaskbarManager
 {
-    [Singleton]
     public sealed class TaskbarController : Plugin
     {
         private IntPtr Handle { get; }
         private ITaskbarList4 TaskbarList { get; }
+        private readonly string _Directory;
 
-        public TaskbarController(IContext ctx) : base(ctx)
+        public TaskbarController(IPluginContext ctx) : base(ctx)
         {
             if(!(Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.CompareTo(new Version(6, 1)) >= 0))
                 throw new Exception("Platform not supported");
@@ -28,6 +27,7 @@ namespace TaskbarManager
             TaskbarList.HrInit();
 
             this.WebView.Window.Visible += Window_VisibleEvent;
+            _Directory = WebView.Browser.Directory;
         }
 
         private void Window_VisibleEvent(IWebView sender, bool isVisible)
@@ -181,7 +181,7 @@ namespace TaskbarManager
                 if (string.IsNullOrEmpty(value))
                     _hIcon = DestroyIcon(_hIcon, GCLP_HICON);
                 else
-                    _hIcon = SetIcon(_hIcon, value, false);
+                    _hIcon = SetIcon(_hIcon, value, false, _Directory);
 
                 // Establecer icono
                 User32.SendMessage(this.Handle, WM_SETICON, (IntPtr)ICON_BIG, _hIcon);
@@ -208,7 +208,7 @@ namespace TaskbarManager
                 if (string.IsNullOrEmpty(value))
                     _hIconSm = DestroyIcon(_hIconSm, GCLP_HICONSM);
                 else
-                    _hIconSm = SetIcon(_hIconSm, value, true);
+                    _hIconSm = SetIcon(_hIconSm, value, true, _Directory);
 
                 // Establecer icono
                 User32.SendMessage(this.Handle, WM_SETICON, (IntPtr)ICON_SMALL, _hIconSm);
@@ -231,12 +231,12 @@ namespace TaskbarManager
             return classIcon;
         }
 
-        private static IntPtr SetIcon(IntPtr hIcon, string path, bool smallIcon)
+        private static IntPtr SetIcon(IntPtr hIcon, string path, bool smallIcon, string root)
         {
             string fullPath = path;
 
             if (!Path.IsPathFullyQualified(path))
-                fullPath = AppManager.SrcPath + "/" + path;
+                fullPath = Path.Combine(root, path);
 
             if (!File.Exists(fullPath))
                 throw new FileNotFoundException("File not found: '" + path + "'");

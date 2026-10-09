@@ -1,9 +1,9 @@
 ﻿using WV;
 using WV.Interfaces;
 using NotifyIcon.Win32;
-using static WV.AppManager;
 using System.ComponentModel;
 using NotifyIcon.Win32.Enums;
+using static WV.App.Delegates;
 using NotifyIcon.Win32.Structs;
 using System.Runtime.InteropServices;
 
@@ -38,17 +38,20 @@ namespace NotifyIcon
 
         private int DoubleClickSpeed { get; } = 500;
 
-        public TrayIcon(IContext ctx) : this(ctx, "")
+        private readonly string Directory;
+
+        public TrayIcon(IPluginContext ctx) : this(ctx, "")
         {
         }
 
-        public TrayIcon(IContext ctx, string icon) : this(ctx, icon, "")
+        public TrayIcon(IPluginContext ctx, string icon) : this(ctx, icon, "")
         {
         }
 
-        public TrayIcon(IContext ctx, string icon, string tooltip) : base(ctx)
+        public TrayIcon(IPluginContext ctx, string icon, string tooltip) : base(ctx)
         {
             // Configurar el icono
+            this.Directory = this.WebView.Browser.Directory;
             this.WinHandle = User32.FindWindow(this.WebView.UID, null);
             this.IconHandle = Helper.GetDefaultIconHandle();
             this.DoubleClickSpeed = User32.GetDoubleClickTime();
@@ -136,7 +139,7 @@ namespace NotifyIcon
                 if (!string.IsNullOrEmpty(value))
                 {
                     if (!Path.IsPathFullyQualified(value))
-                        fullPath = AppManager.SrcPath + "/" + value;
+                        fullPath = Path.Combine(Directory, value);
 
                     if (!File.Exists(fullPath))
                         throw new FileNotFoundException("File not found: '" + value + "'");
@@ -253,7 +256,7 @@ namespace NotifyIcon
 
         public void ShowNotification(string title, string message, string iconSource) // Puede ser: "system", "warning", "error", o ruta de archivo
         {
-            IntPtr hIcon = Helper.GetNotificationIcon(iconSource);
+            IntPtr hIcon = Helper.GetNotificationIcon(iconSource, Directory);
 
             this.TIHandle.uFlags = NotifyIconFlag.NIF_INFO; // | NotifyIconFlag.NIF_ICON | NotifyIconFlag.NIF_MESSAGE;
             this.TIHandle.szInfoTitle = title;
@@ -378,34 +381,10 @@ namespace NotifyIcon
 
         #region MouseDown
 
-        private IJSFunction? OnMouseDownFN { get; set; }
-
-        public object? OnMouseDown
-        {
-            get 
-            {
-                ThrowIfDisposed();
-                return this.OnMouseDownFN?.Raw;
-            }
-            set
-            {
-                ThrowIfDisposed();
-                if (this.OnMouseDownFN != null && value == this.OnMouseDownFN.Raw)
-                    return;
-
-                this.OnMouseDownFN?.Dispose();
-                this.OnMouseDownFN = null;
-
-                if (value == null)
-                    return;
-
-                this.OnMouseDownFN = IJSFunction.Create(value);
-            }
-        }
-
+        
         private void FireMouseDown(string button, POINT pos)
         {
-            this.OnMouseDownFN?.Execute(button, pos.X, pos.Y);
+            
             this.MouseDown?.Invoke(this.WebView, button, pos.X, pos.Y);
         }
 
@@ -413,35 +392,9 @@ namespace NotifyIcon
 
         #region MouseUp
 
-        private IJSFunction? OnMouseUpFN { get; set; }
-
-        public object? OnMouseUp
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return this.OnMouseUpFN?.Raw;
-            }
-            set
-            {
-                ThrowIfDisposed();
-
-                if (this.OnMouseUpFN != null && value == this.OnMouseUpFN.Raw)
-                    return;
-
-                this.OnMouseUpFN?.Dispose();
-                this.OnMouseUpFN = null;
-
-                if (value == null)
-                    return;
-
-                this.OnMouseUpFN = IJSFunction.Create(value);
-            }
-        }
-
+       
         private void FireMouseUp(string button,POINT pos)
         {
-            this.OnMouseUpFN?.Execute(button, pos.X, pos.Y);
             this.MouseUp?.Invoke(this.WebView, button, pos.X, pos.Y);
         }
 
@@ -449,38 +402,11 @@ namespace NotifyIcon
 
         #region Click
 
-        private IJSFunction? OnClickFN { get; set; }
-
-        public object? OnClick
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return this.OnClickFN?.Raw;
-            }
-            set
-            {
-                ThrowIfDisposed();
-
-                if (this.OnClickFN != null && value == this.OnClickFN.Raw)
-                    return;
-
-                this.OnClickFN?.Dispose();
-                this.OnClickFN = null;
-
-                if (value == null)
-                    return;
-
-                this.OnClickFN = IJSFunction.Create(value);
-            }
-        }
-
         private void FireClick(string button, POINT pos)
         {
             if (!this.IsClick)
                 return;
 
-            this.OnClickFN?.Execute(button, pos.X, pos.Y);
             this.Click?.Invoke(this.WebView, button, pos.X, pos.Y);
         }
 
@@ -488,35 +414,8 @@ namespace NotifyIcon
 
         #region DoubleClick
 
-        private IJSFunction? OnDoubleClickFN { get; set; }
-
-        public object? OnDoubleClick
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return this.OnDoubleClickFN?.Raw;
-            }
-            set
-            {
-                ThrowIfDisposed();
-
-                if (this.OnDoubleClickFN != null && value == this.OnDoubleClickFN.Raw)
-                    return;
-
-                this.OnDoubleClickFN?.Dispose();
-                this.OnDoubleClickFN = null;
-
-                if (value == null)
-                    return;
-
-                this.OnDoubleClickFN = IJSFunction.Create(value);
-            }
-        }
-
         private void FireDoubleClick(string button, POINT pos)
         {
-            this.OnDoubleClickFN?.Execute(button, pos.X, pos.Y);
             this.DoubleClick?.Invoke(this.WebView, button, pos.X, pos.Y);
         }
 
@@ -529,9 +428,6 @@ namespace NotifyIcon
             try
             {
                 this.WebView.Window.Raw -= Window_Raw;
-
-                // limpiar los eventos JS
-                this.ClearOnEvents();
 
                 // Eliminar icono de la bandeja
                 if (this.Visible)
@@ -548,14 +444,6 @@ namespace NotifyIcon
                 }
             }
             catch (Exception){ }
-        }
-
-        private void ClearOnEvents()
-        {
-            this.OnMouseDown = null;
-            this.OnMouseUp = null;
-            this.OnClickFN = null;
-            this.OnDoubleClickFN = null;
         }
 
     }

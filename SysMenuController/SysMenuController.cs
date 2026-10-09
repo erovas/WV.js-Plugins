@@ -9,7 +9,6 @@ using WV;
 
 namespace SystemMenu
 {
-    [Singleton]
     public class SysMenuController : Plugin
     {
         #region PRIVATE PROPS
@@ -25,7 +24,7 @@ namespace SystemMenu
 
         #endregion
 
-        public SysMenuController(IContext ctx) : base(ctx)
+        public SysMenuController(IPluginContext ctx) : base(ctx)
         {
             this.IDGenerator = new IDGenerator();
             this._hCustomMenu = User32.CreatePopupMenu();

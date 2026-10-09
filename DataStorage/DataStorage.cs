@@ -1,17 +1,15 @@
 ﻿using WV;
-using WV.Attributes;
 using WV.Interfaces;
 
 namespace DataStorage
 {
-    [Singleton]
     public class DataStorage : Plugin
     {
         private Dictionary<string, object?> Data { get; set; }
 
-        public DataStorage(IContext ctx) : base(ctx)
+        public DataStorage(IPluginContext ctx) : base(ctx)
         {
-            this.Data = AppManager.DataStorage;
+            this.Data = App.DataStorage;
         }
 
         #region PROPS
