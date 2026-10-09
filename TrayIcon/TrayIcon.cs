@@ -377,30 +377,16 @@ namespace NotifyIcon
             }
         }
 
-        #region EVENTS
-
-        #region MouseDown
-
-        
+        #region Fire Events
         private void FireMouseDown(string button, POINT pos)
         {
-            
             this.MouseDown?.Invoke(this.WebView, button, pos.X, pos.Y);
         }
-
-        #endregion
-
-        #region MouseUp
-
        
         private void FireMouseUp(string button,POINT pos)
         {
             this.MouseUp?.Invoke(this.WebView, button, pos.X, pos.Y);
         }
-
-        #endregion
-
-        #region Click
 
         private void FireClick(string button, POINT pos)
         {
@@ -410,16 +396,10 @@ namespace NotifyIcon
             this.Click?.Invoke(this.WebView, button, pos.X, pos.Y);
         }
 
-        #endregion
-
-        #region DoubleClick
-
         private void FireDoubleClick(string button, POINT pos)
         {
             this.DoubleClick?.Invoke(this.WebView, button, pos.X, pos.Y);
         }
-
-        #endregion
 
         #endregion
 

@@ -3,7 +3,7 @@
 [assembly: Plugin(
     Name = "TrayIcon",
     Type = "NotifyIcon.TrayIcon",    
-    Singleton = true,
+    Singleton = false,
     Version = "1.0.0",
     Author = "Emanuel R. Vásquez",
     Description = "Tray Icon"
