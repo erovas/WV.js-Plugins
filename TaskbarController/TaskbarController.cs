@@ -233,13 +233,11 @@ namespace TaskbarManager
 
         private static IntPtr SetIcon(IntPtr hIcon, string path, bool smallIcon, string root)
         {
-            string fullPath = path;
-
-            if (!Path.IsPathFullyQualified(path))
-                fullPath = Path.Combine(root, path);
+            string basePath = Path.GetFullPath(root);
+            string fullPath = Path.GetFullPath(path.TrimStart('/', '\\'), basePath);
 
             if (!File.Exists(fullPath))
-                throw new FileNotFoundException("File not found: '" + path + "'");
+                throw new FileNotFoundException($"File not found: '{fullPath}'");
 
             int cx = 256;
             int cy = 256;

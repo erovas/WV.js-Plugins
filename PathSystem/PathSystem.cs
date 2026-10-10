@@ -101,6 +101,14 @@ namespace PathSystem
             return Path.EndsInDirectorySeparator(path);
         }
 
+        public string GetFullPath(string path, string? basePath = null)
+        {
+            if(basePath == null)
+                return Path.GetFullPath(path);
+            
+            return Path.GetFullPath(path, basePath);
+        }
+
         #endregion
 
         protected override void Dispose(bool disposing)
